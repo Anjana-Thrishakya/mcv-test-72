@@ -4,6 +4,8 @@
  */
 package edu.ijse.stm;
 
+import edu.ijse.stm.view.StudentView;
+
 /**
  *
  * @author anjan
@@ -14,7 +16,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("Hello World");
+        new StudentView().setVisible(true);
     }
     
 }
