@@ -7,6 +7,7 @@ package edu.ijse.stm.view;
 import edu.ijse.stm.controller.StudentController;
 import edu.ijse.stm.dto.StudentDto;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -14,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
  * @author anjan
  */
 public class StudentView extends javax.swing.JFrame {
-    
+
     private StudentController controller = new StudentController();
 
     /**
@@ -77,12 +78,27 @@ public class StudentView extends javax.swing.JFrame {
 
         btnSave.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         btnUpdate.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnUpdate.setText("Update");
+        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateActionPerformed(evt);
+            }
+        });
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         tblStudent.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -95,6 +111,11 @@ public class StudentView extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblStudent.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblStudentMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblStudent);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -163,10 +184,25 @@ public class StudentView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        saveStudent();
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        updateStudent();
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        deleteStudent();
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void tblStudentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblStudentMouseClicked
+        searchStudent();
+    }//GEN-LAST:event_tblStudentMouseClicked
+
     /**
      * @param args the command line arguments
      */
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
@@ -186,10 +222,10 @@ public class StudentView extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void loadTable() {
-        String [] columns = {"Student ID", "Student Name", "Email", "Course"};
-        DefaultTableModel dtm = new DefaultTableModel(columns, 0){
+        String[] columns = {"Student ID", "Student Name", "Email", "Course"};
+        DefaultTableModel dtm = new DefaultTableModel(columns, 0) {
             public boolean isCellEditable(int row, int column) {
-                return false; 
+                return false;
             }
         };
         tblStudent.setModel(dtm);
@@ -204,6 +240,77 @@ public class StudentView extends javax.swing.JFrame {
             }
         } catch (Exception e) {
         }
-        
+
+    }
+
+    private void saveStudent() {
+        StudentDto studentDto = new StudentDto(
+                txtId.getText(),
+                txtName.getText(),
+                txtEmail.getText(),
+                txtCourse.getText());
+        try {
+            String resp = controller.saveStudent(studentDto);
+            JOptionPane.showMessageDialog(this, resp);
+            loadTable();
+            clearForm();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void clearForm() {
+        txtId.setText("");
+        txtName.setText("");
+        txtEmail.setText("");
+        txtCourse.setText("");
+    }
+
+    private void updateStudent() {
+        StudentDto studentDto = new StudentDto(
+                txtId.getText(),
+                txtName.getText(),
+                txtEmail.getText(),
+                txtCourse.getText());
+        try {
+            String resp = controller.updateStudent(studentDto);
+            JOptionPane.showMessageDialog(this, resp);
+            loadTable();
+            clearForm();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteStudent() {
+        try {
+            String resp = controller.deleteStudent(txtId.getText());
+            JOptionPane.showMessageDialog(this, resp);
+            loadTable();
+            clearForm();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private void searchStudent(){
+        String studentId = (String)tblStudent.getValueAt(tblStudent.getSelectedRow(), 0);
+        try {
+            StudentDto studentDto = controller.getStudent(studentId);
+            if(studentDto != null){
+                txtId.setText(studentDto.getStudentId());
+                txtName.setText(studentDto.getName());
+                txtEmail.setText(studentDto.getEmail());
+                txtCourse.setText(studentDto.getCourse());
+            } else {
+                JOptionPane.showMessageDialog(this, "Student not found");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
