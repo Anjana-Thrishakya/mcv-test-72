@@ -8,6 +8,8 @@ import edu.ijse.stm.db.DBConnection;
 import edu.ijse.stm.dto.StudentDto;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 
 
 /**
@@ -38,5 +40,47 @@ public class StudentModel {
         statement.setString(4, studentDto.getStudentId());
         
         return statement.executeUpdate() > 0 ? "Success" : "Fail";
+    }
+    
+    public String deleteStudent(String id) throws Exception{
+        Connection connection = DBConnection.getInstance().getConnection();
+        String sql = "DELETE FROM Student WHERE student_id = ?";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, id);
+        return statement.executeUpdate() > 0 ? "Success" : "Fail";
+    }
+    
+    public StudentDto getStudent(String id) throws Exception{
+        Connection connection = DBConnection.getInstance().getConnection();
+        String sql = "SELECT * FROM Student WHERE student_id = ?";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, id);
+        
+        ResultSet rst = statement.executeQuery();
+        if(rst.next()){
+            return new StudentDto(
+                    rst.getString("student_id"),
+                    rst.getString("name"),
+                    rst.getString("email"),
+                    rst.getString("course"));
+        }
+        return null;
+    }
+    
+    public ArrayList<StudentDto> getAll() throws Exception{
+        Connection connection = DBConnection.getInstance().getConnection();
+        String sql = "SELECT * FROM Student";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        
+        ResultSet rst = statement.executeQuery();
+        ArrayList<StudentDto> dtos = new ArrayList<>();
+        while(rst.next()){
+            dtos.add(new StudentDto(
+                    rst.getString("student_id"),
+                    rst.getString("name"),
+                    rst.getString("email"),
+                    rst.getString("course")));
+        }
+        return dtos;
     }
 }
